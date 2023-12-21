@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+    node:
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        container_name: 'node'
+        ports:
+            - ${APP_PORT:-3000}:${APP_PORT:-3000}
+        volumes:
+            - ./node-app:/node-app
+            # - /node-app/node_modules
+            - ./.env:/node-app/.env
+        networks:
+            - my-network
+        depends_on:
+            - mysql
+
+    mysql:
+        image: mysql/mysql-server:8.0
+        container_name: mysql
+        ports:
+            - ${MYSQLDB_PORT:-3306}:3306
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_ROOT_HOST: "%"
+            MYSQL_DATABASE: ${DB_NAME}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_ALLOW_EMPTY_PASSWORD: 1
+        volumes:
+            - mysqldata:/var/lib/mysql
+        networks:
+            - my-network
+
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: phpmyadmin
+        depends_on:
+            - mysql
+        restart: always
+        ports:
+            - ${FORWARD_PHPMYADMIN_PORT:-8081}:80
+        environment:
+            PMA_HOST: mysql
+            MYSQL_ROOT_PASSWORD: $DB_PASSWORD
+        networks:
+            - my-network
+volumes:
+    mysqldata:
+
+networks:
+    my-network:
+        driver: bridge
