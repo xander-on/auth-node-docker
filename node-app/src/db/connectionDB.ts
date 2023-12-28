@@ -1,9 +1,9 @@
 import { Sequelize } from 'sequelize';
 
 export const initDB = () => {
-    const dbHost = process.env.DB_HOST || 'mysql';
-    const dbName = process.env.DB_NAME|| 'auth-node';
-    const dbUser =  'root';
+    const dbHost = process.env.DB_HOST || 'localhost';
+    const dbName = process.env.DB_NAME || 'auth-node';
+    const dbUser = process.env.DB_USER || 'root';
     const dbPass = process.env.DB_PASSWORD ||'1234';
 
     return new Sequelize(dbName!, dbUser, dbPass, {
